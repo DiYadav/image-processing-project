@@ -12,7 +12,7 @@ def detect_changes(before_path, after_path, output_path):
 
     print("✔ Images loaded successfully.")
 
-    # Resize to same size (very important for stable results)
+    # Resize after image to match before
     after = cv2.resize(after, (before.shape[1], before.shape[0]))
 
     # Convert to grayscale
@@ -22,31 +22,36 @@ def detect_changes(before_path, after_path, output_path):
     # Absolute difference
     diff = cv2.absdiff(gray_before, gray_after)
 
-    # Threshold to highlight changes
+    # Threshold (highlight changes)
     _, thresh = cv2.threshold(diff, 30, 255, cv2.THRESH_BINARY)
 
     # Remove noise
     kernel = np.ones((5, 5), np.uint8)
     cleaned = cv2.morphologyEx(thresh, cv2.MORPH_OPEN, kernel)
 
-    # Find contours of changed areas
+    # Find contours
     contours, _ = cv2.findContours(cleaned, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
-    # Draw bounding boxes on AFTER image
+    # Draw polygons and rectangles
     for c in contours:
-        if cv2.contourArea(c) > 50:   # remove very small changes
-            x, y, w, h = cv2.boundingRect(c)
-            cv2.rectangle(after, (x, y), (x + w, y + h), (0, 0, 255), 2)
+        area = cv2.contourArea(c)
+        if area > 80:  # Skip very small noise
+            # Draw polygon
+            approx = cv2.approxPolyDP(c, 0.01 * cv2.arcLength(c, True), True)
+            cv2.polylines(after, [approx], True, (0, 255, 0), 2)
 
-    # Save result
+            # # Draw rectangle (optional)
+            # x, y, w, h = cv2.boundingRect(c)
+            # cv2.rectangle(after, (x, y), (x+w, y+h), (0, 0, 255), 2)
+
+    # Save output
     cv2.imwrite(output_path, after)
-
-    print(f"✔ Change detection saved at: {output_path}")
+    print(f"✔ Done! Output saved at: {output_path}")
 
 
 if __name__ == "__main__":
-    before_path = "input/before.jpg"   # Add your BEFORE image here
-    after_path = "input/after.jpg"     # Add your AFTER image here
+    before_path = "input/before.jpg"
+    after_path = "input/after.jpg"
     output_path = "output/change_result.jpg"
 
     detect_changes(before_path, after_path, output_path)
