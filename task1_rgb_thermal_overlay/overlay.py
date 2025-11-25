@@ -10,7 +10,7 @@ def rgb_to_thermal(rgb_path, output_path):
         print("❌ Error: Could not load RGB image.")
         return
 
-    print("✔ RGB image loaded successfully.")
+    print("RGB image loaded successfully.")
 
     # Convert RGB image to grayscale
     gray = cv2.cvtColor(rgb, cv2.COLOR_BGR2GRAY)
@@ -20,7 +20,7 @@ def rgb_to_thermal(rgb_path, output_path):
 
     # Save output image
     cv2.imwrite(output_path, thermal_image)
-    print(f"✔ Thermal effect saved at: {output_path}")
+    print(f"Thermal effect saved at: {output_path}")
 
 
 if __name__ == "__main__":
