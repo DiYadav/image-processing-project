@@ -35,14 +35,10 @@ def detect_changes(before_path, after_path, output_path):
     # Draw polygons and rectangles
     for c in contours:
         area = cv2.contourArea(c)
-        if area > 80:  # Skip very small noise
-            # Draw polygon
+        if area > 80:  
+            # polygon
             approx = cv2.approxPolyDP(c, 0.01 * cv2.arcLength(c, True), True)
             cv2.polylines(after, [approx], True, (0, 255, 0), 2)
-
-            # # Draw rectangle (optional)
-            # x, y, w, h = cv2.boundingRect(c)
-            # cv2.rectangle(after, (x, y), (x+w, y+h), (0, 0, 255), 2)
 
     # Save output
     cv2.imwrite(output_path, after)
